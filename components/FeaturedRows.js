@@ -1,9 +1,33 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import { ArrowRightIcon } from 'react-native-heroicons/outline';
+import sanityClient from '../sanity';
 import ResturantCard from './ResturantCard';
 
-const FeaturedRows = ({ title, description }) => {
+const FeaturedRows = ({ id, title, description }) => {
+  const [resturants, setResturants] = React.useState([]);
+  useEffect(() => {
+    sanityClient
+      .fetch(
+        `
+      *[_type == "featured" && _id == "${id}"]{
+        ...,
+        resturants[]->{
+          ...,
+          dishes[]->,
+          type->{
+            name
+          }
+        },
+        
+      }[0]`,
+        { id }
+      )
+      .then((data) => {
+        setResturants(data?.resturants);
+      });
+  }, []);
+
   return (
     <View className="">
       <View
@@ -23,30 +47,22 @@ const FeaturedRows = ({ title, description }) => {
         className="pt-4"
       >
         {/* resturantCard */}
-        <ResturantCard
-          id="123"
-          rating={2.4}
-          short_description="test"
-          dishes={[]}
-          lat={20}
-          long={12}
-          genre="Ghanaian"
-          imgUrl="https://links.papareact.com/gn7"
-          title="KFC"
-          address="Kampala"
-        />
-        <ResturantCard
-          id="123"
-          rating={2.4}
-          short_description="test"
-          dishes={[]}
-          lat={20}
-          long={12}
-          genre="Ghanaian"
-          imgUrl="https://links.papareact.com/gn7"
-          title="KFC"
-          address="Kampala"
-        />
+
+        {resturants?.map((resturant) => (
+          <ResturantCard
+            key={resturant.id}
+            id={resturant.id}
+            rating={resturant.rating}
+            short_description={resturant.short_description}
+            dishes={resturant.dishes}
+            lat={resturant.lat}
+            long={resturant.long}
+            genre={resturant.type?.name}
+            imgUrl={resturant.image}
+            title={resturant.name}
+            address={resturant.address}
+          />
+        ))}
       </ScrollView>
     </View>
   );

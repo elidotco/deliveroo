@@ -18,3 +18,4 @@ export default createSchema({
   // to the ones provided by any plugins that are installed
   types: schemaTypes.concat([resturant, category, featured, dish]),
 });
+``;

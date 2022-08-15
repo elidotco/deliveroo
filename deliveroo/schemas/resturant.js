@@ -16,7 +16,7 @@ export default {
       validation: (Rule) => Rule.required(),
     },
     {
-      name: 'Image',
+      name: 'image',
       type: 'image',
       title: 'Image of the Resturant',
     },
